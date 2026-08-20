@@ -84,6 +84,18 @@ services:
     networks:
       - pizzeria-network
 
+  # 5. Gestor Web Visual de Base de Datos (Adminer)
+  adminer:
+    image: adminer:latest
+    container_name: pizzeria-adminer
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8082}:8080"
+    depends_on:
+      - db
+    networks:
+      - pizzeria-network
+
 # Red interna bridge para comunicación segura y desacoplada
 networks:
   pizzeria-network:
