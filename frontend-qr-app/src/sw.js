@@ -8,7 +8,9 @@ const ASSETS_TO_CACHE = [
   '/index.html',
   '/style.css',
   '/main.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Instalación del Service Worker y precarga de archivos en caché local del móvil
