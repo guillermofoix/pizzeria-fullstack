@@ -14,7 +14,7 @@ const state = {
   pizzas: [],
   cart: {}, // Formato: { [pizzaId]: { pizza, cantidad } }
   activeCategory: 'all',
-  activeOrderId: sessionStorage.getItem('pizzeria_active_order_id') || null,
+  activeOrderId: localStorage.getItem('pizzeria_active_order_id') || null,
   trackingInterval: null
 };
 
@@ -359,7 +359,7 @@ async function submitOrder() {
 
     if (data.success) {
       const orderId = data.data.id;
-      sessionStorage.setItem('pizzeria_active_order_id', orderId);
+      localStorage.setItem('pizzeria_active_order_id', orderId);
       state.activeOrderId = orderId;
 
       // Limpiar carrito
@@ -386,7 +386,7 @@ async function submitOrder() {
 function startOrderTracking(orderId) {
   clearInterval(state.trackingInterval);
   const banner = document.getElementById('active-order-banner');
-  banner.classList.remove('hidden');
+  if (banner) banner.classList.remove('hidden');
 
   const poll = async () => {
     try {
@@ -398,9 +398,9 @@ function startOrderTracking(orderId) {
         const order = data.data;
         updateTrackingUi(order);
 
-        if (order.estado === 'servido' || order.estado === 'cancelado') {
+        if (order.estado === 'servido' || order.estado === 'entregado' || order.estado === 'cancelado') {
           clearInterval(state.trackingInterval);
-          sessionStorage.removeItem('pizzeria_active_order_id');
+          localStorage.removeItem('pizzeria_active_order_id');
         }
       }
     } catch (err) {
@@ -417,20 +417,33 @@ function updateTrackingUi(order) {
   const statusText = document.getElementById('tracking-status-text');
   const progressFill = document.getElementById('progress-bar-fill');
 
-  title.textContent = `Pedido #${order.id} en marcha (Mesa ${order.mesa_numero})`;
+  let tipoDesc = 'Mesa #' + (order.mesa_numero || '');
+  if (order.tipo_pedido === 'domicilio') tipoDesc = 'A Domicilio 🛵';
+  else if (order.tipo_pedido === 'recoger') tipoDesc = 'Para Recoger 🥡';
+
+  if (title) title.textContent = `Pedido #${order.id} (${tipoDesc})`;
 
   if (order.estado === 'pendiente') {
-    statusText.textContent = 'Estado: Recibido en cocina • Esperando horno';
-    progressFill.style.width = '25%';
+    if (statusText) statusText.textContent = 'Estado: Recibido en cocina • Esperando turno de horno';
+    if (progressFill) progressFill.style.width = '25%';
   } else if (order.estado === 'en_preparacion') {
-    statusText.textContent = 'Estado: 🔥 En el horno ahora mismo';
-    progressFill.style.width = '65%';
+    if (statusText) statusText.textContent = 'Estado: 🔥 En el horno artesanal ahora mismo';
+    if (progressFill) progressFill.style.width = '60%';
+  } else if (order.estado === 'en_reparto') {
+    if (statusText) statusText.textContent = 'Estado: 🛵 ¡El repartidor va de camino a tu dirección!';
+    if (progressFill) progressFill.style.width = '85%';
   } else if (order.estado === 'listo') {
-    statusText.textContent = 'Estado: 🍕 ¡Listo para servir en tu mesa!';
-    progressFill.style.width = '100%';
-  } else if (order.estado === 'servido') {
-    statusText.textContent = 'Estado: ✅ ¡Que aproveche!';
-    progressFill.style.width = '100%';
+    if (order.tipo_pedido === 'recoger') {
+      if (statusText) statusText.textContent = 'Estado: 🥡 ¡Listo para recoger en el mostrador!';
+    } else if (order.tipo_pedido === 'domicilio') {
+      if (statusText) statusText.textContent = 'Estado: 🛵 ¡Listo! Empaquetado para reparto';
+    } else {
+      if (statusText) statusText.textContent = 'Estado: 🍕 ¡Listo para servir en tu mesa!';
+    }
+    if (progressFill) progressFill.style.width = '90%';
+  } else if (order.estado === 'servido' || order.estado === 'entregado') {
+    if (statusText) statusText.textContent = 'Estado: ✅ ¡Entregado! ¡Que aproveche!';
+    if (progressFill) progressFill.style.width = '100%';
   }
 }
 
