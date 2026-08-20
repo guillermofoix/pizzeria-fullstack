@@ -2,7 +2,7 @@
 // SERVICE WORKER: PWA PIZZERÍA BELLA NAPOLI (MÓDULO PMDM / DAM)
 // ==============================================================================
 
-const CACHE_NAME = 'pizzeria-pwa-v2';
+const CACHE_NAME = 'pizzeria-pwa-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

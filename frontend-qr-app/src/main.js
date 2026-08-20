@@ -35,22 +35,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initMesaDetection() {
   const urlParams = new URLSearchParams(window.location.search);
   const mesaParam = urlParams.get('mesa');
-
-  const mesaDisplay = document.getElementById('mesa-numero-display');
   const mesaPickerBar = document.getElementById('mesa-picker-bar');
 
   if (mesaParam) {
     state.mesa = parseInt(mesaParam, 10);
     state.tipoEntrega = 'mesa';
-    mesaDisplay.textContent = `Mesa #${state.mesa}`;
-    mesaPickerBar.classList.add('hidden');
+    if (mesaPickerBar) mesaPickerBar.classList.add('hidden');
     selectTipoBtn('mesa');
   } else {
-    // Si no se escaneó mesa (abierto desde casa/app instalada)
-    state.mesa = 3;
+    state.mesa = null;
     state.tipoEntrega = 'domicilio';
-    mesaDisplay.textContent = `🛵 Domicilio`;
-    mesaPickerBar.classList.add('hidden');
+    if (mesaPickerBar) mesaPickerBar.classList.add('hidden');
     selectTipoBtn('domicilio');
   }
 }
@@ -81,23 +76,27 @@ function selectTipoBtn(tipo) {
   const boxMesa = document.getElementById('box-mesa-select');
   const boxDir = document.getElementById('box-direccion');
   const boxTel = document.getElementById('box-telefono');
-  const mesaDisplay = document.getElementById('mesa-numero-display');
+  const icon = document.getElementById('order-mode-icon');
+  const text = document.getElementById('order-mode-text');
 
   if (tipo === 'mesa') {
     if (boxMesa) boxMesa.classList.remove('hidden');
     if (boxDir) boxDir.classList.add('hidden');
     if (boxTel) boxTel.classList.add('hidden');
-    mesaDisplay.textContent = `Mesa #${state.mesa}`;
+    if (icon) icon.textContent = '🍽️';
+    if (text) text.textContent = `Mesa #${state.mesa || 3}`;
   } else if (tipo === 'domicilio') {
     if (boxMesa) boxMesa.classList.add('hidden');
     if (boxDir) boxDir.classList.remove('hidden');
     if (boxTel) boxTel.classList.remove('hidden');
-    mesaDisplay.textContent = `🛵 Domicilio`;
+    if (icon) icon.textContent = '🛵';
+    if (text) text.textContent = 'A Domicilio';
   } else if (tipo === 'recoger') {
     if (boxMesa) boxMesa.classList.add('hidden');
     if (boxDir) boxDir.classList.add('hidden');
     if (boxTel) boxTel.classList.remove('hidden');
-    mesaDisplay.textContent = `🥡 Para Llevar`;
+    if (icon) icon.textContent = '🥡';
+    if (text) text.textContent = 'Para Llevar';
   }
 }
 
