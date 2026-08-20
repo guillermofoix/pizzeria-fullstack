@@ -4,10 +4,8 @@
  * ==============================================================================
  */
 
-// Base URL de la API REST (Usa proxy relativo o localhost:3000)
-const API_BASE_URL = window.location.port === '8081' || window.location.port === '80'
-  ? '/api'
-  : 'http://localhost:3000/api';
+// Base URL de la API REST (Enrutada automáticamente por el Reverse Proxy de Nginx)
+const API_BASE_URL = '/api';
 
 // Estado local de la aplicación móvil
 const state = {
