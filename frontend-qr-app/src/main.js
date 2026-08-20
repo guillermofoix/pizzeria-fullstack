@@ -333,10 +333,13 @@ async function submitOrder() {
   }));
 
   const payload = {
+    tipo_pedido: state.tipoEntrega,
     tipo_entrega: state.tipoEntrega,
-    mesa_numero: state.tipoEntrega === 'mesa' ? state.mesa : null,
+    mesa_numero: state.tipoEntrega === 'mesa' ? (state.mesa || 1) : null,
     cliente_nombre: clienteNombre,
+    cliente_telefono: telefono,
     telefono: telefono,
+    cliente_direccion: direccion,
     direccion_entrega: direccion,
     observaciones: observaciones,
     lineas: lineas

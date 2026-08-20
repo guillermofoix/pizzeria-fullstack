@@ -161,16 +161,14 @@ export const createPedido = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const { 
-      tipo_pedido = 'mesa', 
-      mesa_numero, 
-      cliente_nombre, 
-      cliente_telefono, 
-      cliente_direccion, 
-      metodo_pago = 'efectivo_entrega', 
-      observaciones, 
-      lineas 
-    } = req.body;
+    const tipo_pedido = req.body.tipo_pedido || req.body.tipo_entrega || (req.body.mesa_numero ? 'mesa' : 'domicilio');
+    const mesa_numero = req.body.mesa_numero;
+    const cliente_nombre = req.body.cliente_nombre;
+    const cliente_telefono = req.body.cliente_telefono || req.body.telefono;
+    const cliente_direccion = req.body.cliente_direccion || req.body.direccion_entrega;
+    const metodo_pago = req.body.metodo_pago || 'efectivo_entrega';
+    const observaciones = req.body.observaciones;
+    const lineas = req.body.lineas;
 
     if (!lineas || !Array.isArray(lineas) || lineas.length === 0) {
       return res.status(400).json({
