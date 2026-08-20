@@ -90,14 +90,14 @@ services:
     networks:
       - pizzeria-prod-network
 
-  # 6. Túnel HTTPS Público Seguro (Cloudflare Tunnel para red del Instituto)
+  # 6. Túnel HTTPS Público Seguro (Cloudflare Tunnel para App Móvil DAM)
   # Se activa con: docker compose -f docker-compose.prod.yml --profile tunnel up -d
   tunnel:
     image: cloudflare/cloudflared:latest
     container_name: pizzeria-prod-tunnel
     restart: unless-stopped
     profiles: ["tunnel"]
-    command: tunnel --no-autoupdate --url http://frontend-web:80
+    command: tunnel --no-autoupdate --url http://frontend-qr-app:80
     networks:
       - pizzeria-prod-network
 
