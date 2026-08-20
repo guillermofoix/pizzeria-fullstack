@@ -402,8 +402,15 @@ if (btnInstallPwa) {
       const { outcome } = await deferredPrompt.userChoice;
       console.log('📱 Resultado de instalación PWA:', outcome);
       deferredPrompt = null;
-      btnInstallPwa.classList.add('hidden');
       btnInstallPwa.style.display = 'none';
+    } else {
+      // Si el navegador no permite el prompt automático (ej: HTTP en IP local o iOS Safari)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        alert('📲 Para instalar en tu iPhone:\n1. Toca el botón Compartir ⬆️ abajo.\n2. Selecciona "Añadir a pantalla de inicio".');
+      } else {
+        alert('📲 Para instalar en tu Android:\n1. Toca los 3 puntos (⋮) arriba a la derecha en Chrome.\n2. Pulsa "Instalar aplicación" o "Añadir a pantalla de inicio".');
+      }
     }
   });
 }
