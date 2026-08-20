@@ -1,9 +1,9 @@
 {
-  "id": "/?mesa=1",
+  "id": "/",
   "name": "Pizzería Bella Napoli",
   "short_name": "BellaNapoli",
   "description": "Carta Digital interactiva y pedidos de mesa para comensales",
-  "start_url": "/?mesa=1",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "fullscreen"],
