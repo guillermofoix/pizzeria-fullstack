@@ -10,6 +10,7 @@ const API_BASE_URL = '/api';
 // Estado local de la aplicación móvil
 const state = {
   mesa: null,
+  tipoEntrega: 'domicilio',
   pizzas: [],
   cart: {}, // Formato: { [pizzaId]: { pizza, cantidad } }
   activeCategory: 'all',
@@ -21,6 +22,7 @@ const state = {
 document.addEventListener('DOMContentLoaded', async () => {
   initMesaDetection();
   setupEventListeners();
+  setupTipoEntregaListeners();
   await loadPizzas();
 
   // Si hay un pedido activo guardado en la sesión, reanudar el seguimiento
@@ -36,25 +38,66 @@ function initMesaDetection() {
 
   const mesaDisplay = document.getElementById('mesa-numero-display');
   const mesaPickerBar = document.getElementById('mesa-picker-bar');
-  const mesaSelect = document.getElementById('mesa-select');
 
   if (mesaParam) {
     state.mesa = parseInt(mesaParam, 10);
-    mesaDisplay.textContent = `#${state.mesa}`;
+    state.tipoEntrega = 'mesa';
+    mesaDisplay.textContent = `Mesa #${state.mesa}`;
     mesaPickerBar.classList.add('hidden');
+    selectTipoBtn('mesa');
   } else {
-    // Si no se escaneó con parámetro de mesa, mostrar selector manual
-    state.mesa = parseInt(mesaSelect.value, 10);
-    mesaDisplay.textContent = `#${state.mesa}`;
-    mesaPickerBar.classList.remove('hidden');
+    // Si no se escaneó mesa (abierto desde casa/app instalada)
+    state.mesa = 3;
+    state.tipoEntrega = 'domicilio';
+    mesaDisplay.textContent = `🛵 Domicilio`;
+    mesaPickerBar.classList.add('hidden');
+    selectTipoBtn('domicilio');
+  }
+}
 
-    mesaSelect.addEventListener('change', (e) => {
-      state.mesa = parseInt(e.target.value, 10);
-      mesaDisplay.textContent = `#${state.mesa}`;
-      if (!document.getElementById('checkout-modal').classList.contains('hidden')) {
-        renderCheckoutDrawer();
-      }
+function setupTipoEntregaListeners() {
+  document.querySelectorAll('.tipo-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const tipo = e.currentTarget.dataset.tipo;
+      selectTipoBtn(tipo);
     });
+  });
+}
+
+function selectTipoBtn(tipo) {
+  state.tipoEntrega = tipo;
+  document.querySelectorAll('.tipo-btn').forEach(b => {
+    if (b.dataset.tipo === tipo) {
+      b.style.background = '#dc2626';
+      b.style.borderColor = '#dc2626';
+      b.style.color = '#ffffff';
+    } else {
+      b.style.background = '#1e293b';
+      b.style.borderColor = '#334155';
+      b.style.color = '#cbd5e1';
+    }
+  });
+
+  const boxMesa = document.getElementById('box-mesa-select');
+  const boxDir = document.getElementById('box-direccion');
+  const boxTel = document.getElementById('box-telefono');
+  const mesaDisplay = document.getElementById('mesa-numero-display');
+
+  if (tipo === 'mesa') {
+    if (boxMesa) boxMesa.classList.remove('hidden');
+    if (boxDir) boxDir.classList.add('hidden');
+    if (boxTel) boxTel.classList.add('hidden');
+    mesaDisplay.textContent = `Mesa #${state.mesa}`;
+  } else if (tipo === 'domicilio') {
+    if (boxMesa) boxMesa.classList.add('hidden');
+    if (boxDir) boxDir.classList.remove('hidden');
+    if (boxTel) boxTel.classList.remove('hidden');
+    mesaDisplay.textContent = `🛵 Domicilio`;
+  } else if (tipo === 'recoger') {
+    if (boxMesa) boxMesa.classList.add('hidden');
+    if (boxDir) boxDir.classList.add('hidden');
+    if (boxTel) boxTel.classList.remove('hidden');
+    mesaDisplay.textContent = `🥡 Para Llevar`;
   }
 }
 
@@ -274,8 +317,15 @@ function closeCheckoutDrawer() {
 // ─── ENVÍO DEL PEDIDO A LA API REST ─────────────────────────────────────────
 async function submitOrder() {
   const sendBtn = document.getElementById('btn-send-order');
-  const clienteNombre = document.getElementById('cliente-nombre').value.trim() || `Comensal Mesa ${state.mesa}`;
+  const clienteNombre = document.getElementById('cliente-nombre').value.trim() || `Cliente ${state.tipoEntrega.toUpperCase()}`;
   const observaciones = document.getElementById('cliente-observaciones').value.trim();
+  const direccion = document.getElementById('cliente-direccion')?.value.trim() || null;
+  const telefono = document.getElementById('cliente-telefono')?.value.trim() || null;
+
+  if (state.tipoEntrega === 'domicilio' && !direccion) {
+    alert('Por favor, indica tu dirección de entrega.');
+    return;
+  }
 
   const lineas = Object.values(state.cart).map(item => ({
     pizza_id: item.pizza.id,
@@ -284,8 +334,11 @@ async function submitOrder() {
   }));
 
   const payload = {
-    mesa_numero: state.mesa,
+    tipo_entrega: state.tipoEntrega,
+    mesa_numero: state.tipoEntrega === 'mesa' ? state.mesa : null,
     cliente_nombre: clienteNombre,
+    telefono: telefono,
+    direccion_entrega: direccion,
     observaciones: observaciones,
     lineas: lineas
   };
