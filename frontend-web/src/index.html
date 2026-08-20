@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e63946">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
   <title>Pizzería Bella Napoli - Portal Web & Sistema Full-Stack</title>
   
   <!-- Google Fonts -->
@@ -110,6 +114,13 @@
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500 status-dot"></span>
           <span class="status-text">Conectando...</span>
         </div>
+
+        <!-- Botón Instalar App PWA -->
+        <button id="btn-install-web-pwa" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all cursor-pointer">
+          <span>📲</span>
+          <span class="hidden sm:inline">Instalar</span>
+          <span class="sm:hidden">App</span>
+        </button>
 
         <!-- Botón Toggle Dark / Light Mode -->
         <button id="btn-theme-toggle" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-sm transition-all cursor-pointer" title="Alternar Modo Claro / Oscuro">
@@ -872,5 +883,40 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <script src="main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('📱 [PWA Web] Service Worker activo:', reg.scope))
+          .catch(err => console.warn('⚠️ [PWA Web] SW:', err));
+      });
+    }
+
+    let deferredWebPrompt = null;
+    const btnInstallWebPwa = document.getElementById('btn-install-web-pwa');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredWebPrompt = e;
+    });
+
+    if (btnInstallWebPwa) {
+      btnInstallWebPwa.addEventListener('click', async () => {
+        if (deferredWebPrompt) {
+          deferredWebPrompt.prompt();
+          const { outcome } = await deferredWebPrompt.userChoice;
+          console.log('PWA outcome:', outcome);
+          deferredWebPrompt = null;
+        } else {
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          if (isIOS) {
+            alert('📲 Para instalar en tu iPhone:\n1. Toca el botón Compartir ⬆️ abajo en Safari.\n2. Selecciona "Añadir a pantalla de inicio".');
+          } else {
+            alert('📲 Para instalar en tu Android/PC:\n1. Toca los 3 puntos (⋮) arriba a la derecha en Chrome.\n2. Pulsa "Instalar aplicación" o "Añadir a pantalla de inicio".');
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
