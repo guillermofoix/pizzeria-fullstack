@@ -20,7 +20,6 @@ jobs:
     name: 🧪 Tests Backend & PostgreSQL
     runs-on: ubuntu-latest
 
-    # Servicio de Base de Datos PostgreSQL 16 efímero para pruebas en GitHub
     services:
       postgres:
         image: postgres:16-alpine
@@ -44,23 +43,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          cache-dependency-path: backend/package.json
 
       - name: 🗄️ Inicializar esquema de Base de Datos (init.sql)
+        env:
+          PGPASSWORD: pizzeria_pass_2026!
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
-          PGPASSWORD=pizzeria_pass_2026! psql -h localhost -U pizzeria_user -d pizzeria_db -f database/init.sql
+          psql -h 127.0.0.1 -p 5432 -U pizzeria_user -d pizzeria_db -f database/init.sql
 
       - name: 📥 Instalar dependencias del Backend
         working-directory: ./backend
-        run: npm ci
+        run: npm install
 
       - name: 🧪 Ejecutar batería de Tests Unitarios e Integración
         working-directory: ./backend
         env:
           NODE_ENV: test
-          DB_HOST: localhost
+          DB_HOST: 127.0.0.1
           DB_PORT: 5432
           DB_USER: pizzeria_user
           DB_PASSWORD: pizzeria_pass_2026!
