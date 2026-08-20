@@ -380,3 +380,38 @@ function updateTrackingUi(order) {
     progressFill.style.width = '100%';
   }
 }
+
+// ─── PWA: GESTIÓN DE INSTALACIÓN NATIVA ─────────────────────────────────────
+let deferredPrompt = null;
+const btnInstallPwa = document.getElementById('btn-install-pwa');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Previene el banner por defecto del navegador para controlarlo nosotros
+  e.preventDefault();
+  deferredPrompt = e;
+  if (btnInstallPwa) {
+    btnInstallPwa.classList.remove('hidden');
+    btnInstallPwa.style.display = 'flex';
+  }
+});
+
+if (btnInstallPwa) {
+  btnInstallPwa.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('📱 Resultado de instalación PWA:', outcome);
+      deferredPrompt = null;
+      btnInstallPwa.classList.add('hidden');
+      btnInstallPwa.style.display = 'none';
+    }
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  console.log('🎉 PWA instalada con éxito en el dispositivo');
+  if (btnInstallPwa) {
+    btnInstallPwa.classList.add('hidden');
+    btnInstallPwa.style.display = 'none';
+  }
+});
