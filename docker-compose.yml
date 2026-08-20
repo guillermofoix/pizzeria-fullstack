@@ -1,0 +1,95 @@
+# ==============================================================================
+# ORQUESTACIÓN COMPLETA: PIZZERÍA FULL-STACK (DAW & DAM)
+# ==============================================================================
+# Levantar todo el stack con: docker compose up --build
+# ==============================================================================
+
+services:
+  # 1. Base de Datos Relacional (PostgreSQL)
+  db:
+    image: postgres:16-alpine
+    container_name: pizzeria-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-pizzeria_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pizzeria_pass_1234}
+      POSTGRES_DB: ${DB_NAME:-pizzeria_db}
+    ports:
+      - "5432:5432" # Puerto estándar por defecto de PostgreSQL
+    volumes:
+      - pizzeria_pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pizzeria_user} -d ${DB_NAME:-pizzeria_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pizzeria-network
+
+  # 2. Backend API REST (Node.js Express)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pizzeria-backend
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-pizzeria_user}
+      DB_PASSWORD: ${DB_PASSWORD:-pizzeria_pass_1234}
+      DB_NAME: ${DB_NAME:-pizzeria_db}
+      NODE_ENV: production
+    volumes:
+      - ./backend/src:/app/src
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pizzeria-network
+
+  # 3. Frontend Web: Panel Mostrador & Cocina KDS (Módulo DAW)
+  frontend-web:
+    build:
+      context: ./frontend-web
+      dockerfile: Dockerfile
+    container_name: pizzeria-frontend-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend-web/src:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - pizzeria-network
+
+  # 4. Frontend QR App: WebApp Móvil Clientes (Módulo DAM)
+  frontend-qr-app:
+    build:
+      context: ./frontend-qr-app
+      dockerfile: Dockerfile
+    container_name: pizzeria-frontend-qr
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./frontend-qr-app/src:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - pizzeria-network
+
+# Red interna bridge para comunicación segura y desacoplada
+networks:
+  pizzeria-network:
+    driver: bridge
+
+# Volumen persistente para la base de datos PostgreSQL
+volumes:
+  pizzeria_pgdata:
+    driver: local

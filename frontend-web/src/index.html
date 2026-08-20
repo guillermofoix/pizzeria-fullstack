@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizzería Bella Napoli - Portal Web & Sistema Full-Stack</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Engine & Configuración Completa -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#e63946',
+              600: '#d62828',
+              700: '#ba181b',
+              amber: '#f59e0b',
+              orange: '#ea580c',
+              green: '#10b981',
+              blue: '#3b82f6',
+            }
+          },
+          keyframes: {
+            slideLeft: {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(0)' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            }
+          },
+          animation: {
+            'slide-left': 'slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'slide-up': 'slideUp 0.3s ease forwards'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans min-h-screen flex flex-col antialiased transition-colors duration-200">
+
+  <!-- ==================== HEADER PRINCIPAL ==================== -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      
+      <!-- LOGO Y TÍTULO -->
+      <div id="brand-logo" class="flex items-center gap-2.5 cursor-pointer select-none group shrink-0">
+        <span class="text-2xl transform group-hover:rotate-12 transition-transform duration-300">🍕</span>
+        <div>
+          <h1 class="font-display font-black text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white leading-none">
+            Bella Napoli
+          </h1>
+          <p id="app-subtitle" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+            Auténtica Pizza Napolitana
+          </p>
+        </div>
+      </div>
+
+      <!-- NAVEGACIÓN MODO PÚBLICO (DESKTOP) -->
+      <nav id="nav-cliente" class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/60">
+        <button class="nav-tab active px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-500 shadow-sm flex items-center gap-1.5 transition-all" data-view="landing">
+          <span>🏠</span> <span>Inicio</span>
+        </button>
+        <button class="nav-tab px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 flex items-center gap-1.5 transition-all" data-view="menu">
+          <span>🍕</span> <span class="whitespace-nowrap">Carta & Pedidos</span>
+        </button>
+        <button class="nav-tab px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 flex items-center gap-1.5 transition-all" data-view="tracking" id="nav-tracking-btn">
+          <span>📍</span> <span class="whitespace-nowrap">Seguir Pedido</span>
+          <span id="badge-tracking" class="hidden ml-1 px-1.5 py-0.2 text-[10px] font-bold bg-brand-500 text-white rounded-full">1</span>
+        </button>
+      </nav>
+
+      <!-- NAVEGACIÓN MODO PERSONAL (DESKTOP) -->
+      <nav id="nav-personal" class="hidden items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/60">
+        <button class="nav-tab active px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-500 shadow-sm flex items-center gap-1.5 transition-all" data-tab="cocina">
+          <span>🔥</span> <span>Cocina KDS</span>
+          <span id="badge-cocina-count" class="px-1.5 py-0.2 text-[10px] font-bold bg-black/30 text-white rounded-full">0</span>
+        </button>
+        <button class="nav-tab px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 flex items-center gap-1.5 transition-all" data-tab="mostrador">
+          <span>➕</span> <span>TPV Caja</span>
+        </button>
+        <button class="nav-tab admin-only px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 flex items-center gap-1.5 transition-all" data-tab="carta">
+          <span>🍕</span> <span>Gestión Carta</span>
+        </button>
+        <button class="nav-tab admin-only px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/50 flex items-center gap-1.5 transition-all" data-tab="mesas">
+          <span>🪑</span> <span>Mesas & QR</span>
+        </button>
+      </nav>
+
+      <!-- ACCIONES DE CABECERA -->
+      <div class="flex items-center gap-2">
+        <!-- Indicador de API -->
+        <div id="api-status" class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 status-dot"></span>
+          <span class="status-text">Conectando...</span>
+        </div>
+
+        <!-- Botón Toggle Dark / Light Mode -->
+        <button id="btn-theme-toggle" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-sm transition-all cursor-pointer" title="Alternar Modo Claro / Oscuro">
+          <span id="theme-icon">🌙</span>
+        </button>
+
+        <!-- Botón de Carrito (Clientes) -->
+        <button id="btn-header-cart" class="relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:hover:bg-slate-700 hover:bg-slate-800 border border-slate-800 dark:border-slate-700 font-bold text-xs shadow-sm transition-all cursor-pointer">
+          <span class="text-sm">🛒</span>
+          <span class="hidden sm:inline">Cesta</span>
+          <span id="header-cart-count" class="px-1.5 py-0.2 text-[10px] font-extrabold bg-brand-500 text-white rounded-full">0</span>
+        </button>
+
+        <!-- Botón Login Personal (Desktop) -->
+        <button id="btn-staff-auth" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 font-bold text-xs transition-all cursor-pointer">
+          <span>🔐</span>
+          <span id="staff-auth-text">Acceso Personal</span>
+        </button>
+
+        <!-- BOTÓN MENÚ HAMBURGUESA (MÓVILES & TABLETS) -->
+        <button id="btn-mobile-menu" class="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-base transition-all cursor-pointer" title="Abrir menú de navegación">
+          <span id="hamburger-icon">☰</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- PANEL DESPLEGABLE MÓVIL (HAMBURGUESA) -->
+    <div id="mobile-menu-dropdown" class="md:hidden hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-4 py-3 space-y-2 shadow-xl transition-all">
+      
+      <!-- Navegación Cliente Móvil -->
+      <div id="mobile-nav-cliente" class="space-y-1">
+        <button class="mobile-nav-tab w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5" data-view="landing">
+          <span>🏠</span> <span>Inicio</span>
+        </button>
+        <button class="mobile-nav-tab w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5" data-view="menu">
+          <span>🍕</span> <span>Carta & Pedidos Online</span>
+        </button>
+        <button class="mobile-nav-tab w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between" data-view="tracking">
+          <div class="flex items-center gap-2.5">
+            <span>📍</span> <span>Seguir Pedido</span>
+          </div>
+          <span id="mobile-badge-tracking" class="hidden px-1.5 py-0.2 text-[10px] font-bold bg-brand-500 text-white rounded-full">1</span>
+        </button>
+      </div>
+
+      <!-- Navegación Personal Móvil -->
+      <div id="mobile-nav-personal" class="hidden space-y-1">
+        <button class="mobile-personal-tab w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5" data-tab="cocina">
+          <span>🔥</span> <span>Cocina KDS</span>
+        </button>
+        <button class="mobile-personal-tab w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5" data-tab="mostrador">
+          <span>➕</span> <span>TPV Mostrador</span>
+        </button>
+        <button class="mobile-personal-tab admin-only w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5" data-tab="carta">
+          <span>🍕</span> <span>Gestión Carta</span>
+        </button>
+        <button class="mobile-personal-tab admin-only w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5" data-tab="mesas">
+          <span>🪑</span> <span>Mesas & QR</span>
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+        <button id="btn-mobile-staff-auth" class="w-full text-left px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm text-amber-500 hover:bg-amber-500/10 flex items-center gap-2.5">
+          <span>🔐</span> <span>Acceso Personal (PIN)</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== BANNER DE SESIÓN ACTIVA EMPLEADO ==================== -->
+  <div id="staff-active-bar" class="hidden bg-slate-900 border-b border-amber-500 text-white px-4 py-2 text-xs shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-base" id="staff-avatar">👨‍🍳</span>
+        <span>Sesión Activa: <strong id="staff-role-name" class="text-amber-400">Cocinero</strong></span>
+        <span class="text-slate-400 text-[11px]">(PIN Verificado)</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="staff-role-badge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 uppercase">KDS Cocina</span>
+        <button id="btn-logout-staff" class="text-xs font-semibold text-slate-300 hover:text-white underline cursor-pointer">Cerrar Turno / Salir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CONTENEDOR PRINCIPAL ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ============================================================== -->
+    <!-- 1. VISTA PÚBLICA: LANDING PAGE COMERCIAL                       -->
+    <!-- ============================================================== -->
+    <section id="view-landing" class="client-view active space-y-12">
+      
+      <!-- HERO SECTION -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-2">
+        
+        <div class="lg:col-span-7 space-y-5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 dark:bg-brand-500/20 border border-brand-500/30 text-brand-600 dark:text-brand-500 text-[11px] font-bold tracking-wide uppercase">
+            🔥 Forno a Legna Napoletano • Desde 1984
+          </div>
+          
+          <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+            El auténtico sabor de Nápoles en tu mesa o en tu casa
+          </h2>
+          
+          <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+            Harinas italianas seleccionadas, fermentación lenta de 48 horas, tomates San Marzano D.O.P. y mozzarella fresca horneada en leña a 450°C.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-3 pt-1">
+            <button id="btn-hero-domicilio" class="flex-1 flex items-center gap-3.5 p-3.5 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold shadow-md shadow-brand-500/20 hover:shadow-brand-500/35 hover:-translate-y-0.5 transition-all text-left cursor-pointer">
+              <span class="text-2xl">🛵</span>
+              <div>
+                <strong class="block text-sm leading-tight">Pedir a Domicilio</strong>
+                <small class="text-[11px] text-white/80 font-normal">Entrega caliente en 30-40 min</small>
+              </div>
+            </button>
+
+            <button id="btn-hero-recoger" class="flex-1 flex items-center gap-3.5 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-semibold shadow-sm hover:border-amber-500 hover:-translate-y-0.5 transition-all text-left cursor-pointer">
+              <span class="text-2xl">🥡</span>
+              <div>
+                <strong class="block text-sm leading-tight">Para Recoger</strong>
+                <small class="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Pasa a buscarlo sin esperas</small>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 relative">
+          <div class="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 group">
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=80" alt="Pizza Napolitana Artesanal" class="w-full h-64 sm:h-72 lg:h-80 object-cover transform group-hover:scale-105 transition-transform duration-700">
+            <div class="absolute bottom-3 left-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-3 rounded-2xl border border-white/20 dark:border-slate-700/50 flex items-center justify-between text-xs font-semibold shadow-md">
+              <span class="text-amber-500 flex items-center gap-1 font-bold">⭐ 4.9/5 (1.4k reseñas)</span>
+              <span class="text-slate-700 dark:text-slate-200">+15.000 Pizzas con Pasión</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FEATURES / PILARES DE CALIDAD -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 transition-colors shadow-sm space-y-2">
+          <span class="text-3xl block">🌾</span>
+          <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Fermentación 48 Horas</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Masa ligera, altamente digestiva y con bordes inflados y crujientes por el calor de la leña.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 transition-colors shadow-sm space-y-2">
+          <span class="text-3xl block">🍅</span>
+          <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Ingredientes D.O.P.</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Tomates San Marzano de Campania, Mozzarella Fior di Latte y quesos curados con denominación protegida.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 transition-colors shadow-sm space-y-2">
+          <span class="text-3xl block">⚡</span>
+          <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Entrega Exprés & Caliente</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Reparto térmico especial para que cada pizza llegue a tu puerta como recién salida de nuestro horno.</p>
+        </div>
+      </div>
+
+      <!-- ESPECIALIDADES DESTACADAS -->
+      <div class="space-y-8">
+        <div class="text-center space-y-2">
+          <span class="text-xs font-extrabold tracking-widest text-brand-500 uppercase">Nuestras Obras de Arte</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl text-slate-900 dark:text-white">Las Pizzas más aclamadas de la casa</h2>
+        </div>
+
+        <div id="landing-featured-pizzas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Render dinámico desde JS -->
+        </div>
+
+        <div class="text-center pt-4">
+          <button id="btn-ver-todas-landing" class="px-8 py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-base shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-105 transition-all cursor-pointer">
+            🍕 Ver Menú Completo & Pedir Online ➔
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 2. VISTA PÚBLICA: CARTA & PEDIDOS CLIENTES                     -->
+    <!-- ============================================================== -->
+    <section id="view-menu" class="client-view hidden space-y-8">
+      
+      <!-- BARRA DE CONFIGURACIÓN DEL PEDIDO (MODALIDAD) -->
+      <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4 shadow-sm">
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="cursor-pointer">
+            <input type="radio" name="order-type" value="domicilio" checked class="peer sr-only">
+            <div class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm peer-checked:bg-brand-500 peer-checked:text-white peer-checked:border-brand-500 transition-all flex items-center gap-2">
+              <span>🛵</span> <span>A Domicilio</span>
+            </div>
+          </label>
+
+          <label class="cursor-pointer">
+            <input type="radio" name="order-type" value="recoger" class="peer sr-only">
+            <div class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm peer-checked:bg-brand-500 peer-checked:text-white peer-checked:border-brand-500 transition-all flex items-center gap-2">
+              <span>🥡</span> <span>Para Recoger en Local</span>
+            </div>
+          </label>
+
+          <label id="radio-label-mesa" class="hidden cursor-pointer">
+            <input type="radio" name="order-type" value="mesa" class="peer sr-only">
+            <div class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:border-emerald-500 transition-all flex items-center gap-2">
+              <span>🍽️</span> <span id="txt-label-mesa">En Mesa 3</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- BANNER INFORMATIVO SEGÚN MODALIDAD -->
+      <div id="order-mode-info-banner" class="p-4 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-600 dark:text-brand-400 text-sm flex items-center gap-3">
+        <span id="mode-info-icon" class="text-2xl">🛵</span>
+        <div id="mode-info-text">
+          <strong>Pedido a Domicilio:</strong> Te lo llevamos caliente a casa en 30-40 min. Pago en mano al repartidor (efectivo o datáfono).
+        </div>
+      </div>
+
+      <!-- FILTRO DE CATEGORÍAS & BÚSQUEDA -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div id="client-cat-filters" class="flex items-center gap-2 overflow-x-auto pb-1">
+          <button class="pill-btn active px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 border border-slate-900 dark:border-white whitespace-nowrap cursor-pointer transition-all" data-cat="all">
+            🔥 Todas las Pizzas
+          </button>
+          <button class="pill-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-400 whitespace-nowrap cursor-pointer transition-all" data-cat="1">
+            🍕 Clásicas
+          </button>
+          <button class="pill-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-400 whitespace-nowrap cursor-pointer transition-all" data-cat="2">
+            ⭐ Especiales
+          </button>
+          <button class="pill-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-400 whitespace-nowrap cursor-pointer transition-all" data-cat="3">
+            👑 Gourmet
+          </button>
+        </div>
+
+        <div class="min-w-[260px]">
+          <input type="text" id="input-search-pizzas" placeholder="🔍 Buscar por nombre o ingrediente..." class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+        </div>
+      </div>
+
+      <!-- GRID DE PIZZAS CLIENTE -->
+      <div id="client-pizzas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="col-span-full text-center py-12 text-slate-500">Cargando carta artesanal...</div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 3. VISTA PÚBLICA: SEGUIMIENTO EN VIVO (TRACKING)               -->
+    <!-- ============================================================== -->
+    <section id="view-tracking" class="client-view hidden">
+      <div class="max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-8">
+        
+        <div class="text-center space-y-2">
+          <span id="tracking-type-badge" class="inline-block px-3 py-1 rounded-full text-xs font-extrabold tracking-wider bg-brand-500/10 text-brand-500 border border-brand-500/30 uppercase">
+            🛵 Pedido a Domicilio
+          </span>
+          <h2 id="tracking-order-title" class="font-display font-black text-2xl sm:text-3xl text-slate-900 dark:text-white">
+            Estado de tu Pedido #--
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Actualizado en directo desde los hornos de la pizzería</p>
+        </div>
+
+        <!-- PROGRESS STEPS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div id="step-pendiente" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1">
+            <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-xs">1</div>
+            <span class="text-xs font-bold block">Recibido</span>
+          </div>
+          <div id="step-preparacion" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1">
+            <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-xs">2</div>
+            <span class="text-xs font-bold block">En el Horno</span>
+          </div>
+          <div id="step-camino" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1">
+            <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-xs">3</div>
+            <span class="text-xs font-bold block" id="step-camino-label">En Reparto</span>
+          </div>
+          <div id="step-entregado" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1">
+            <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-xs">4</div>
+            <span class="text-xs font-bold block">Entregado</span>
+          </div>
+        </div>
+
+        <!-- RESUMEN DEL PEDIDO -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-3">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">📋 Pizzas en Marcha</h4>
+            <div id="tracking-items-list" class="space-y-1.5 text-sm"></div>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-bold text-base">
+              <span>Total:</span>
+              <strong id="tracking-total-val" class="text-brand-500">0.00 €</strong>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-3">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">📍 Datos de Entrega</h4>
+            <div id="tracking-dest-info" class="text-sm space-y-1"></div>
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500">
+              💳 Pago: <strong class="text-slate-800 dark:text-slate-200">En mano al recibir</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center pt-2">
+          <button id="btn-tracking-back-menu" class="px-6 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-all cursor-pointer">
+            🍕 Hacer otro pedido
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 4. VISTA PERSONAL: PANELES INTERNOS (KDS / CARTA / MESAS / TPV)-->
+    <!-- ============================================================== -->
+    <div id="view-personal-container" class="hidden space-y-6">
+
+      <!-- TAB 1: COCINA KDS -->
+      <section id="tab-cocina" class="tab-content active space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-display font-black text-2xl text-slate-900 dark:text-white">🔥 Tablero de Cocina KDS en Vivo</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Comandas en tiempo real organizadas por estado y canal de venta.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+              <button class="chip-filter active px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 cursor-pointer" data-filter-type="all">Todos</button>
+              <button class="chip-filter px-3 py-1 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer" data-filter-type="domicilio">🛵 Domicilio</button>
+              <button class="chip-filter px-3 py-1 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer" data-filter-type="recoger">🥡 Recoger</button>
+              <button class="chip-filter px-3 py-1 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer" data-filter-type="mesa">🍽️ Mesa</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANBAN BOARD -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Columna 1: Pendientes -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col min-h-[520px] shadow-sm">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 rounded-t-2xl flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></span>
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white">Nuevos / Pendientes</h3>
+              </div>
+              <span id="count-pendiente" class="px-2 py-0.5 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-800">0</span>
+            </div>
+            <div id="list-pedidos-pendiente" class="p-4 space-y-4 overflow-y-auto flex-1"></div>
+          </div>
+
+          <!-- Columna 2: En Preparación -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col min-h-[520px] shadow-sm">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 rounded-t-2xl flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-brand-orange shadow-sm shadow-orange-500/50"></span>
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white">En Horno / Reparto</h3>
+              </div>
+              <span id="count-preparacion" class="px-2 py-0.5 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-800">0</span>
+            </div>
+            <div id="list-pedidos-preparacion" class="p-4 space-y-4 overflow-y-auto flex-1"></div>
+          </div>
+
+          <!-- Columna 3: Listos -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col min-h-[520px] shadow-sm">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 rounded-t-2xl flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white">Listos / Entregados</h3>
+              </div>
+              <span id="count-listo" class="px-2 py-0.5 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-800">0</span>
+            </div>
+            <div id="list-pedidos-listo" class="p-4 space-y-4 overflow-y-auto flex-1"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: GESTIÓN DE CARTA (SOLO ADMIN) -->
+      <section id="tab-carta" class="tab-content hidden space-y-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h2 class="font-display font-black text-2xl text-slate-900 dark:text-white">🍕 Administración del Catálogo de Pizzas</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Creación, edición de precios, disponibilidad e ingredientes en PostgreSQL.</p>
+          </div>
+          <button id="btn-open-new-pizza" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm shadow-md transition-all cursor-pointer">
+            ➕ Añadir Nueva Pizza
+          </button>
+        </div>
+        <div id="admin-pizzas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+      </section>
+
+      <!-- TAB 3: GESTIÓN DE MESAS & QR (SOLO ADMIN) -->
+      <section id="tab-mesas" class="tab-content hidden space-y-6">
+        <div>
+          <h2 class="font-display font-black text-2xl text-slate-900 dark:text-white">🪑 Gestión de Sala & Códigos QR</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Descarga o visualiza los códigos QR para cada mesa física del restaurante.</p>
+        </div>
+        <div id="mesas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+      </section>
+
+      <!-- TAB 4: TPV MOSTRADOR -->
+      <section id="tab-mostrador" class="tab-content hidden space-y-6">
+        <div>
+          <h2 class="font-display font-black text-2xl text-slate-900 dark:text-white">➕ Crear Pedido Manual en Mostrador / TPV</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Para registrar pedidos telefónicos o clientes presenciales en caja.</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-8 space-y-4">
+            <h3 class="font-bold text-sm text-slate-400 uppercase tracking-wider">Selecciona las pizzas:</h3>
+            <div id="pos-pizzas-list" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+          </div>
+          <div class="lg:col-span-4 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Resumen del Ticket</h3>
+            <div class="space-y-3 text-sm">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Tipo de Pedido:</label>
+                <select id="pos-tipo-pedido" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+                  <option value="mesa">🍽️ En Mesa</option>
+                  <option value="domicilio">🛵 A Domicilio</option>
+                  <option value="recoger">🥡 Para Recoger</option>
+                </select>
+              </div>
+              <div id="pos-mesa-wrap">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Mesa:</label>
+                <select id="pos-mesa" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+                  <option value="1">Mesa 1</option>
+                  <option value="2">Mesa 2</option>
+                  <option value="3">Mesa 3</option>
+                  <option value="4">Mesa 4</option>
+                  <option value="5">Mesa 5</option>
+                  <option value="6">Mesa 6</option>
+                  <option value="7">Mesa 7</option>
+                  <option value="8">Mesa 8</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Cliente:</label>
+                <input type="text" id="pos-cliente" placeholder="Nombre cliente" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+              </div>
+              <div id="pos-dir-wrap" class="hidden">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Dirección:</label>
+                <input type="text" id="pos-direccion" placeholder="Calle y número" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+              </div>
+              <div id="pos-tel-wrap" class="hidden">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Teléfono:</label>
+                <input type="tel" id="pos-telefono" placeholder="600 000 000" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Observaciones:</label>
+                <input type="text" id="pos-obs" placeholder="Ej: Masa fina, sin orégano" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+              </div>
+            </div>
+            <div id="pos-ticket-items" class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800 min-h-[60px]"></div>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-slate-800 font-bold text-lg">
+              <span>Total:</span>
+              <strong id="pos-total-amount" class="text-brand-500">0.00 €</strong>
+            </div>
+            <button id="btn-submit-pos" class="w-full py-3 rounded-xl bg-brand-500 text-white font-bold hover:bg-brand-600 disabled:opacity-50 transition-all cursor-pointer" disabled>
+              🚀 Enviar Pedido a Cocina
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== PIE DE PÁGINA (FOOTER COMERCIAL) ==================== -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-16 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        
+        <!-- COLUMNA 1: MARCA E HISTORIA -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-3xl">🍕</span>
+            <h3 class="font-display font-black text-xl text-slate-900 dark:text-white">Bella Napoli</h3>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            La auténtica tradición napolitana con harinas seleccionadas, fermentación lenta de 48 horas e ingredientes con denominación de origen protegida (D.O.P.).
+          </p>
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+            Social: @pizzeria_demo_fp
+          </span>
+        </div>
+
+        <!-- COLUMNA 2: HORARIOS -->
+        <div class="space-y-3 text-sm">
+          <h4 class="font-display font-bold text-base text-slate-900 dark:text-white">🕒 Horarios & Reparto</h4>
+          <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+            <li><strong>Martes a Jueves:</strong> 20:00 - 23:30</li>
+            <li><strong>Viernes a Domingo:</strong> 13:00 - 16:00 | 20:00 - 00:00</li>
+            <li><strong>Lunes:</strong> Cerrado por descanso</li>
+            <li class="text-amber-500 font-semibold pt-1">🛵 Reparto a domicilio en todo el horario.</li>
+          </ul>
+        </div>
+
+        <!-- COLUMNA 3: UBICACIÓN Y CONTACTO -->
+        <div class="space-y-3 text-sm">
+          <h4 class="font-display font-bold text-base text-slate-900 dark:text-white">📍 Dónde Estamos</h4>
+          <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+            <li>📍 Calle Falsa 123, Ciudad Demo</li>
+            <li>📞 Pedidos Demo: <strong class="text-slate-900 dark:text-white">900 000 000</strong></li>
+            <li>✉️ contacto@example.com</li>
+            <li>🍽️ Salón climatizado con 8 mesas y terraza</li>
+          </ul>
+        </div>
+
+        <!-- COLUMNA 4: ENLACES RÁPIDOS -->
+        <div class="space-y-3 text-sm">
+          <h4 class="font-display font-bold text-base text-slate-900 dark:text-white">🔗 Enlaces Rápidos</h4>
+          <ul class="space-y-2">
+            <li><a href="#" id="footer-link-menu" class="text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors">🍕 Ver Carta y Precios</a></li>
+            <li><a href="#" id="footer-link-domicilio" class="text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors">🛵 Pedir a Domicilio</a></li>
+            <li><a href="#" id="footer-link-recoger" class="text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors">🥡 Pedir para Recoger</a></li>
+            <li><a href="#" id="footer-link-tracking" class="text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors">📍 Consultar Estado Pedido</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BARRA INFERIOR DE DERECHOS -->
+    <div class="border-t border-slate-200 dark:border-slate-800 py-6 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between flex-wrap gap-4">
+        <p>© 2026 Pizzería Bella Napoli S.L. • Proyecto Full-Stack FP Informática.</p>
+        <div class="flex items-center gap-4">
+          <span>Aviso Legal</span>
+          <span>•</span>
+          <span>Privacidad</span>
+          <span>•</span>
+          <button id="btn-footer-staff" class="text-amber-500 hover:text-amber-400 font-bold cursor-pointer">🔐 Intranet Empleados</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== DRAWER / MODAL DEL CARRITO CLIENTE ==================== -->
+  <div id="cart-drawer-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex justify-end">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 h-full flex flex-col shadow-2xl animate-slide-left">
+      
+      <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🛒</span>
+          <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white">Tu Pedido Online</h3>
+        </div>
+        <button id="btn-close-cart" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-2xl cursor-pointer">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-6">
+        
+        <!-- RESUMEN DE MODALIDAD -->
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+          <span id="cart-mode-icon" class="text-2xl">🛵</span>
+          <div id="cart-mode-details" class="text-xs">
+            <strong class="block text-sm text-slate-900 dark:text-white">Modalidad: A Domicilio</strong>
+            <small class="text-slate-500 dark:text-slate-400">Entrega en 30-40 min</small>
+          </div>
+        </div>
+
+        <!-- FORMULARIO SEGÚN MODALIDAD -->
+        <div class="space-y-4 text-sm">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Tu Nombre *</label>
+            <input type="text" id="checkout-cliente-nombre" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Ej: Laura Martínez" required>
+          </div>
+
+          <div id="checkout-tel-group">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Teléfono de Contacto *</label>
+            <input type="tel" id="checkout-cliente-tel" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Ej: 600 000 000" required>
+          </div>
+
+          <div id="checkout-dir-group">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Dirección de Entrega Completa *</label>
+            <textarea id="checkout-cliente-dir" rows="2" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Calle Falsa 123, 2º B (Piso, puerta, etc.)" required></textarea>
+          </div>
+
+          <div id="checkout-mesa-group" class="hidden">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Mesa Asignada:</label>
+            <input type="text" id="checkout-mesa-display" class="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-bold" readonly value="Mesa 3">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Notas para cocina / repartidor:</label>
+            <input type="text" id="checkout-observaciones" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Ej: Llamar al móvil al llegar, masa crujiente...">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Forma de Pago:</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="payment-method" value="efectivo_entrega" checked class="peer sr-only">
+                <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-center peer-checked:border-brand-500 peer-checked:bg-brand-500/10 peer-checked:text-brand-500 transition-all">
+                  💵 Efectivo
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="payment-method" value="tarjeta_entrega" class="peer sr-only">
+                <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-center peer-checked:border-brand-500 peer-checked:bg-brand-500/10 peer-checked:text-brand-500 transition-all">
+                  💳 Datáfono
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ITEMS DEL CARRITO -->
+        <div class="space-y-3 pt-2">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pizzas seleccionadas:</h4>
+          <div id="cart-items-container" class="space-y-2"></div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+          <span class="font-bold text-sm">Total a Pagar:</span>
+          <strong id="cart-total-amount" class="font-display font-black text-2xl text-brand-500">0.00 €</strong>
+        </div>
+
+      </div>
+
+      <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+        <button id="btn-submit-order" class="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-base shadow-lg shadow-brand-500/25 disabled:opacity-50 transition-all cursor-pointer" disabled>
+          🚀 Confirmar y Enviar Pedido
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE ACCESO PERSONAL (PIN) ==================== -->
+  <div id="staff-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 relative">
+      
+      <button id="btn-close-staff-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-2xl cursor-pointer">&times;</button>
+      
+      <div class="text-center space-y-1">
+        <span class="text-4xl block">🔐</span>
+        <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white">Acceso Personal & Cocina</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Introduce tu PIN de 4 dígitos</p>
+      </div>
+
+      <!-- PIN DISPLAY -->
+      <div class="text-center">
+        <input type="password" id="staff-pin-input" maxlength="4" placeholder="••••" readonly class="w-full py-3 text-center text-3xl font-black tracking-[0.5em] rounded-2xl bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none">
+      </div>
+
+      <!-- TECLADO NUMÉRICO TÁCTIL -->
+      <div class="grid grid-cols-3 gap-2.5">
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="1">1</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="2">2</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="3">3</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="4">4</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="5">5</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="6">6</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="7">7</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="8">8</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="9">9</button>
+        <button id="btn-pin-clear" class="py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 text-brand-500 text-lg font-black hover:bg-slate-300 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer">C</button>
+        <button class="key-btn py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xl font-black hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all cursor-pointer" data-val="0">0</button>
+        <button id="btn-pin-enter" class="py-3.5 rounded-2xl bg-brand-500 text-white text-lg font-black hover:bg-brand-600 active:scale-95 transition-all cursor-pointer">➔</button>
+      </div>
+
+      <!-- ACCESOS RÁPIDOS PARA CLASE -->
+      <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <p class="text-[10px] text-center text-slate-400 font-bold uppercase tracking-wider">Demostración en aula:</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-demo-cocina" class="py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-500 border border-amber-500/30 transition-all cursor-pointer">
+            👨‍🍳 PIN 1111 (Cocinero)
+          </button>
+          <button id="btn-demo-admin" class="py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-purple-500 border border-purple-500/30 transition-all cursor-pointer">
+            👑 PIN 9999 (Admin)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE ADMINISTRACIÓN DE PIZZAS ==================== -->
+  <div id="pizza-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative">
+      
+      <button id="btn-close-pizza-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-2xl cursor-pointer">&times;</button>
+      
+      <div>
+        <h3 id="pizza-modal-title" class="font-display font-black text-2xl text-slate-900 dark:text-white">🍕 Añadir Nueva Pizza</h3>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Modifica el catálogo en tiempo real en la base de datos PostgreSQL</p>
+      </div>
+
+      <form id="pizza-form" class="space-y-4 text-sm">
+        <input type="hidden" id="form-pizza-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre de la Pizza *</label>
+            <input type="text" id="form-pizza-nombre" required placeholder="Ej: Trufada Suprema" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Categoría</label>
+            <select id="form-pizza-categoria" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+              <option value="1">🍕 Clásicas</option>
+              <option value="2">⭐ Especiales</option>
+              <option value="3">👑 Gourmet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Precio (€) *</label>
+            <input type="number" id="form-pizza-precio" step="0.10" min="0" required placeholder="12.50" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">URL de la Imagen</label>
+            <input type="url" id="form-pizza-imagen" placeholder="https://images.unsplash.com/..." class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Descripción de ingredientes y masa</label>
+          <textarea id="form-pizza-desc" rows="2" placeholder="Descripción apetecible para los clientes..." class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm"></textarea>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="form-pizza-disponible" checked class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500">
+          <label for="form-pizza-disponible" class="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Disponible para pedir en la carta</label>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" id="btn-cancel-pizza-modal" class="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-all">Cancelar</button>
+          <button type="submit" id="btn-save-pizza" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold shadow-md cursor-pointer transition-all">💾 Guardar Pizza</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE CÓDIGO QR ==================== -->
+  <div id="qr-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-center relative">
+      <button id="btn-close-qr-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-2xl cursor-pointer">&times;</button>
+      
+      <h3 id="modal-qr-title" class="font-display font-black text-xl text-slate-900 dark:text-white">Código QR - Mesa #</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400">Escanea desde tu móvil para acceder a la comanda de mesa.</p>
+      
+      <div class="p-4 bg-white rounded-2xl inline-block shadow-md">
+        <img id="qr-image" src="" alt="Código QR" class="w-48 h-48 mx-auto">
+      </div>
+
+      <div class="space-y-2">
+        <input type="text" id="qr-url-input" readonly class="w-full p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-center font-mono">
+        <a id="qr-open-link" href="#" target="_blank" class="block w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs shadow-md transition-all">
+          📱 Abrir Vista Mesa en Pestaña
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script src="main.js"></script>
+</body>
+</html>

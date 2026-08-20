@@ -1,0 +1,89 @@
+# ==============================================================================
+# COMPOSE DE PRODUCCIÓN: PIZZERÍA BELLA NAPOLI (MINIPC / CLOUD)
+# ==============================================================================
+# Despliegue en producción con un solo comando:
+# docker compose -f docker-compose.prod.yml up -d --build
+# ==============================================================================
+
+services:
+  # 1. Base de Datos Relacional (PostgreSQL 16) - AISLADA EN RED INTERNA
+  db:
+    image: postgres:16-alpine
+    container_name: pizzeria-prod-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-pizzeria_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pizzeria_pass_2026!}
+      POSTGRES_DB: ${DB_NAME:-pizzeria_db}
+    volumes:
+      - pizzeria_prod_pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pizzeria_user} -d ${DB_NAME:-pizzeria_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pizzeria-prod-network
+    # En producción NO exponemos el puerto 5432 al exterior por seguridad
+
+  # 2. Backend API REST (Node.js Express) - AISLADO EN RED INTERNA
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pizzeria-prod-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: ${BACKEND_PORT:-3000}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-pizzeria_user}
+      DB_PASSWORD: ${DB_PASSWORD:-pizzeria_pass_2026!}
+      DB_NAME: ${DB_NAME:-pizzeria_db}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pizzeria-prod-network
+    # En producción NO exponemos el puerto 3000 al exterior; Nginx actúa de proxy inverso
+
+  # 3. Frontend Web Comercial & KDS (Nginx Reverse Proxy) - PUERTO PÚBLICO
+  frontend-web:
+    build:
+      context: ./frontend-web
+      dockerfile: Dockerfile
+    container_name: pizzeria-prod-web
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      - backend
+    networks:
+      - pizzeria-prod-network
+
+  # 4. Frontend QR Móvil (WebApp Clientes en Sala)
+  frontend-qr-app:
+    build:
+      context: ./frontend-qr-app
+      dockerfile: Dockerfile
+    container_name: pizzeria-prod-qr
+    restart: unless-stopped
+    ports:
+      - "${QR_PORT:-8081}:80"
+    depends_on:
+      - backend
+    networks:
+      - pizzeria-prod-network
+
+# Red interna bridge para comunicación segura entre contenedores
+networks:
+  pizzeria-prod-network:
+    driver: bridge
+
+# Volumen persistente para datos de PostgreSQL en disco
+volumes:
+  pizzeria_prod_pgdata:
+    driver: local

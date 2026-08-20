@@ -1,0 +1,91 @@
+# ==============================================================================
+# PIPELINE CI/CD: PIZZERÍA BELLA NAPOLI
+# ==============================================================================
+# Este flujo se dispara automáticamente en cada 'git push' o 'pull request'
+# ==============================================================================
+
+name: CI/CD Pipeline - Pizzería Full-Stack
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  # 1. INTEGRACIÓN Y TESTS AUTOMATIZADOS CON POSTGRESQL EN MEMORIA
+  # ────────────────────────────────────────────────────────────────────────────
+  backend-test:
+    name: 🧪 Tests Backend & PostgreSQL
+    runs-on: ubuntu-latest
+
+    # Servicio de Base de Datos PostgreSQL 16 efímero para pruebas en GitHub
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pizzeria_user
+          POSTGRES_PASSWORD: pizzeria_pass_2026!
+          POSTGRES_DB: pizzeria_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: 📦 Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: backend/package.json
+
+      - name: 🗄️ Inicializar esquema de Base de Datos (init.sql)
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          PGPASSWORD=pizzeria_pass_2026! psql -h localhost -U pizzeria_user -d pizzeria_db -f database/init.sql
+
+      - name: 📥 Instalar dependencias del Backend
+        working-directory: ./backend
+        run: npm ci
+
+      - name: 🧪 Ejecutar batería de Tests Unitarios e Integración
+        working-directory: ./backend
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: pizzeria_user
+          DB_PASSWORD: pizzeria_pass_2026!
+          DB_NAME: pizzeria_db
+        run: npm test
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 2. VALIDACIÓN DE COMPILACIÓN DOCKER (PRODUCCIÓN)
+  # ────────────────────────────────────────────────────────────────────────────
+  docker-build-test:
+    name: 🐳 Validación de Imágenes Docker
+    needs: backend-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 📄 Preparar archivo .env de prueba
+        run: cp .env.example .env
+
+      - name: 🏗️ Validar sintaxis y compilar Docker Compose de Producción
+        run: |
+          docker compose -f docker-compose.prod.yml config
+          docker compose -f docker-compose.prod.yml build

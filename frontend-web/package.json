@@ -1,0 +1,12 @@
+{
+  "name": "pizzeria-frontend-web",
+  "version": "1.0.0",
+  "description": "Panel Web de Gestión, Mostrador y Cocina (DAW) para Pizzería Full-Stack",
+  "scripts": {
+    "dev": "npx serve src -p 8080",
+    "start": "npx serve src -p 8080"
+  },
+  "keywords": ["pizzeria", "kds", "frontend", "daw", "dashboard"],
+  "author": "Departamento de Informática - IES La Mola",
+  "license": "MIT"
+}

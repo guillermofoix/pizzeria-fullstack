@@ -1,0 +1,131 @@
+### ==============================================================================
+### PIZZERÍA BELLA NAPOLI - COLECCIÓN DE PETICIONES REST CLIENT (.http)
+### Puedes ejecutar cada petición haciendo clic en "Send Request" en VS Code.
+### ==============================================================================
+
+@baseUrl = http://localhost:8080/api
+
+### 1. DIAGNÓSTICO DE SALUD (HEALTHCHECK)
+# Comprueba que el servidor Express y PostgreSQL están vivos y conectados.
+GET {{baseUrl}}/health
+Content-Type: application/json
+
+###
+
+### 2. LISTAR CATÁLOGO DE PIZZAS
+# Obtiene todas las pizzas con sus ingredientes y categorías.
+GET {{baseUrl}}/pizzas
+Content-Type: application/json
+
+###
+
+### 3. CONSULTAR DETALLE DE UNA PIZZA POR ID
+# Consulta la pizza #1 (Margherita Clásica)
+GET {{baseUrl}}/pizzas/1
+Content-Type: application/json
+
+###
+
+### 4. CREAR PEDIDO A DOMICILIO (VALIDACIÓN COMPLETA)
+# Tramita un pedido a domicilio con transacción atómica en base de datos.
+POST {{baseUrl}}/pedidos
+Content-Type: application/json
+
+{
+  "tipo_pedido": "domicilio",
+  "cliente_nombre": "Carlos Gómez",
+  "cliente_telefono": "600000015",
+  "cliente_direccion": "Calle Falsa 42, 2º B",
+  "metodo_pago": "efectivo_entrega",
+  "observaciones": "Llamar al telefonillo al llegar",
+  "lineas": [
+    {
+      "pizza_id": 1,
+      "cantidad": 2,
+      "notas": "Masa tostada"
+    },
+    {
+      "pizza_id": 3,
+      "cantidad": 1,
+      "notas": "Extra orégano"
+    }
+  ]
+}
+
+###
+
+### 5. CREAR PEDIDO EN MESA (SIMULACIÓN QR MESA 4)
+# Tramita un pedido físico en sala asociado a la Mesa 4.
+POST {{baseUrl}}/pedidos
+Content-Type: application/json
+
+{
+  "tipo_pedido": "mesa",
+  "mesa_numero": 4,
+  "cliente_nombre": "Marta Comensal",
+  "observaciones": "Servir primero las bebidas",
+  "lineas": [
+    {
+      "pizza_id": 2,
+      "cantidad": 1,
+      "notas": "Bien picante"
+    }
+  ]
+}
+
+###
+
+### 6. CONSULTAR TRACKING / ESTADO DE UN PEDIDO ESPECÍFICO
+# Cambia el ID (ej: 101 o el ID generado en la petición anterior)
+GET {{baseUrl}}/pedidos/101
+Content-Type: application/json
+
+###
+
+### 7. ACTUALIZAR ESTADO DE COMANDA (KDS COCINA)
+# Estados válidos: 'en_preparacion', 'en_reparto', 'listo', 'servido', 'entregado', 'cancelado'
+PUT {{baseUrl}}/pedidos/101/estado
+Content-Type: application/json
+
+{
+  "estado": "en_preparacion"
+}
+
+###
+
+### 8. GESTIÓN DE SALA: CONSULTAR MESAS Y QR
+GET {{baseUrl}}/mesas
+Content-Type: application/json
+
+###
+
+### 9. ADMIN: CREAR NUEVA PIZZA EN EL CATÁLOGO
+POST {{baseUrl}}/pizzas
+Content-Type: application/json
+
+{
+  "nombre": "Pizza Cuatro Estaciones FP",
+  "categoria_id": 2,
+  "precio": 13.90,
+  "descripcion": "Jamón cocido, champiñones, alcachofas y aceitunas negras",
+  "disponible": true,
+  "imagen_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591"
+}
+
+###
+
+### 10. ERROR CONTROLADO: PEDIDO A DOMICILIO SIN DIRECCIÓN (DEBE DAR 400)
+POST {{baseUrl}}/pedidos
+Content-Type: application/json
+
+{
+  "tipo_pedido": "domicilio",
+  "cliente_nombre": "Prueba Error",
+  "cliente_telefono": "600000000",
+  "lineas": [
+    {
+      "pizza_id": 1,
+      "cantidad": 1
+    }
+  ]
+}

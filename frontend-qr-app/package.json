@@ -1,0 +1,12 @@
+{
+  "name": "pizzeria-frontend-qr-app",
+  "version": "1.0.0",
+  "description": "WebApp Móvil Ligera para Clientes con Pedidos por QR (DAM) para Pizzería Full-Stack",
+  "scripts": {
+    "dev": "npx serve src -p 8081",
+    "start": "npx serve src -p 8081"
+  },
+  "keywords": ["pizzeria", "qr", "mobile", "dam", "pwa"],
+  "author": "Departamento de Informática - IES La Mola",
+  "license": "MIT"
+}

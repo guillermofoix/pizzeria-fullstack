@@ -1,0 +1,35 @@
+# ==============================================================================
+# GITIGNORE - PIZZERÍA FULL-STACK
+# ==============================================================================
+
+# Variables de entorno y secretos (NUNCA subir a repositorios públicos)
+.env
+.env.local
+.env.production
+*.env
+
+# Documentación docente privada, informes y prácticas
+docs/
+backups/
+backup_*.sql
+*.sql.bak
+
+# Dependencias de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs y bases de datos temporales
+*.log
+logs/
+pgdata/
+scratch/

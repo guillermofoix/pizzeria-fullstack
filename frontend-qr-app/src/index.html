@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pizzería Bella Napoli - Carta Digital & Pedidos QR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- APP CONTAINER -->
+  <div class="mobile-app">
+
+    <!-- HERO HEADER -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand">
+          <span class="brand-emoji">🍕</span>
+          <div>
+            <h1 class="brand-name">Bella Napoli</h1>
+            <p class="brand-tagline">Pizzería Artesanal</p>
+          </div>
+        </div>
+        <div id="mesa-badge" class="mesa-badge">
+          <span>Mesa</span>
+          <strong id="mesa-numero-display">--</strong>
+        </div>
+      </div>
+
+      <!-- SELECTOR DE MESA SI NO VIENE EN LA URL -->
+      <div id="mesa-picker-bar" class="mesa-picker-bar hidden">
+        <span>Selecciona tu mesa:</span>
+        <select id="mesa-select">
+          <option value="1">Mesa 1</option>
+          <option value="2">Mesa 2</option>
+          <option value="3" selected>Mesa 3</option>
+          <option value="4">Mesa 4</option>
+          <option value="5">Mesa 5</option>
+          <option value="6">Mesa 6</option>
+          <option value="7">Mesa 7</option>
+          <option value="8">Mesa 8</option>
+        </select>
+      </div>
+
+      <!-- CATEGORY SLIDER -->
+      <nav class="category-slider">
+        <button class="cat-pill active" data-cat="all">🔥 Todas</button>
+        <button class="cat-pill" data-cat="1">🍕 Clásicas</button>
+        <button class="cat-pill" data-cat="2">⭐ Especiales</button>
+        <button class="cat-pill" data-cat="3">👑 Gourmet</button>
+      </nav>
+    </header>
+
+    <!-- MAIN SCROLLABLE CONTENT -->
+    <main class="app-content">
+      
+      <!-- ESTADO DE PEDIDO ACTIVO (SI YA REALIZÓ UNO) -->
+      <section id="active-order-banner" class="order-status-banner hidden">
+        <div class="order-status-card">
+          <div class="order-status-header">
+            <span class="status-live-icon">🔥</span>
+            <div>
+              <h3 id="tracking-title">Pedido #104 en marcha</h3>
+              <p id="tracking-status-text">Estado: En preparación en el horno</p>
+            </div>
+          </div>
+          <div class="progress-bar-track">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CATÁLOGO DE PIZZAS -->
+      <section class="menu-section">
+        <h2 class="menu-heading">Nuestras Pizzas de Autor</h2>
+        <div id="pizzas-container" class="pizzas-list">
+          <div class="loading-state">
+            <p>Cargando carta artesanal...</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BARRA INFERIOR FLOTANTE DEL CARRITO -->
+    <footer id="floating-cart" class="floating-cart hidden">
+      <div class="cart-summary" id="btn-open-cart">
+        <div class="cart-badge-wrap">
+          <span class="cart-icon">🛒</span>
+          <span id="cart-item-count" class="cart-count">0</span>
+        </div>
+        <div class="cart-price-info">
+          <span class="cart-label">Tu Pedido</span>
+          <span id="cart-total-price" class="cart-total">0.00 €</span>
+        </div>
+      </div>
+      <button id="btn-checkout" class="btn btn-checkout">
+        Ver Pedido ➔
+      </button>
+    </footer>
+
+    <!-- MODAL / DRAWER DE CHECKOUT -->
+    <div id="checkout-modal" class="checkout-drawer hidden">
+      <div class="drawer-overlay" id="drawer-overlay"></div>
+      <div class="drawer-panel">
+        <div class="drawer-header">
+          <h2 class="drawer-title">Confirmar Pedido</h2>
+          <button id="btn-close-drawer" class="btn-close">&times;</button>
+        </div>
+
+        <div class="drawer-body">
+          <div class="checkout-mesa-info">
+            <span>📍 Pedido para la <strong>Mesa <span id="checkout-mesa-val">--</span></strong></span>
+          </div>
+
+          <div class="form-group">
+            <label for="cliente-nombre">¿A nombre de quién?</label>
+            <input type="text" id="cliente-nombre" placeholder="Ej: Carlos" class="input-field">
+          </div>
+
+          <div class="form-group">
+            <label for="cliente-observaciones">Observaciones o Alergias:</label>
+            <input type="text" id="cliente-observaciones" placeholder="Ej: Sin orégano, masa bien hecha" class="input-field">
+          </div>
+
+          <h3 class="items-title">Pizzas seleccionadas:</h3>
+          <div id="checkout-items-list" class="checkout-items">
+            <!-- Items renderizados dinámicamente -->
+          </div>
+
+          <div class="checkout-totals">
+            <div class="total-row">
+              <span>Total:</span>
+              <strong id="checkout-total-val" class="total-amount">0.00 €</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer-footer">
+          <button id="btn-send-order" class="btn btn-primary btn-block">
+            🚀 Enviar Pedido a Cocina
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
