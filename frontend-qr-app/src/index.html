@@ -27,30 +27,9 @@
             <p class="brand-tagline">Pizzería Artesanal</p>
           </div>
         </div>
-        <div class="header-actions" style="display: flex; gap: 8px; align-items: center;">
-          <button id="btn-install-pwa" onclick="handlePwaInstallClick()" class="btn-install" style="background: linear-gradient(135deg, #dc2626, #991b1b); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(220,38,38,0.4);">
-            📲 Instalar
-          </button>
-          <div id="mode-badge" class="mesa-badge" style="cursor: pointer; background: linear-gradient(135deg, #dc2626, #991b1b); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 700; color: white;">
-            <span id="order-mode-icon">🛵</span>
-            <strong id="order-mode-text">A Domicilio</strong>
-          </div>
+        <div id="mesa-qr-tag" class="mesa-badge hidden" style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+          🍽️ Mesa <span id="mesa-qr-num">--</span>
         </div>
-      </div>
-
-      <!-- SELECTOR DE MESA SI NO VIENE EN LA URL -->
-      <div id="mesa-picker-bar" class="mesa-picker-bar hidden">
-        <span>Selecciona tu mesa:</span>
-        <select id="mesa-select">
-          <option value="1">Mesa 1</option>
-          <option value="2">Mesa 2</option>
-          <option value="3" selected>Mesa 3</option>
-          <option value="4">Mesa 4</option>
-          <option value="5">Mesa 5</option>
-          <option value="6">Mesa 6</option>
-          <option value="7">Mesa 7</option>
-          <option value="8">Mesa 8</option>
-        </select>
       </div>
 
       <!-- CATEGORY SLIDER -->
@@ -120,24 +99,22 @@
         </div>
 
         <div class="drawer-body">
-          <!-- SELECTOR DE TIPO DE PEDIDO (DOMICILIO / RECOGER / MESA) -->
-          <div class="form-group" style="margin-bottom: 12px;">
+          <!-- SELECTOR DE TIPO DE PEDIDO PARA CASA -->
+          <div id="box-tipo-selector" class="form-group" style="margin-bottom: 12px;">
             <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 6px;">¿Cómo deseas tu pedido?</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
-              <button type="button" class="tipo-btn active" data-tipo="domicilio" style="padding: 8px 4px; font-size: 0.75rem; font-weight: 700; border-radius: 12px; border: 1px solid #dc2626; background: #dc2626; color: white; cursor: pointer;">
-                🛵 Domicilio
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button type="button" class="tipo-btn active" data-tipo="domicilio" style="padding: 10px 6px; font-size: 0.8rem; font-weight: 700; border-radius: 12px; border: 1px solid #dc2626; background: #dc2626; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                🛵 A Domicilio
               </button>
-              <button type="button" class="tipo-btn" data-tipo="recoger" style="padding: 8px 4px; font-size: 0.75rem; font-weight: 700; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: #cbd5e1; cursor: pointer;">
-                🥡 Recoger
-              </button>
-              <button type="button" class="tipo-btn" data-tipo="mesa" style="padding: 8px 4px; font-size: 0.75rem; font-weight: 700; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: #cbd5e1; cursor: pointer;">
-                🍽️ En Mesa
+              <button type="button" class="tipo-btn" data-tipo="recoger" style="padding: 10px 6px; font-size: 0.8rem; font-weight: 700; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                🥡 Para Recoger
               </button>
             </div>
           </div>
 
-          <div class="checkout-mesa-info hidden" id="box-mesa-select">
-            <span>📍 Pedido para la <strong>Mesa <span id="checkout-mesa-val">3</span></strong></span>
+          <!-- BANNER SI SE ESCANEA QR EN MESA -->
+          <div class="checkout-mesa-info hidden" id="box-mesa-select" style="background: rgba(220,38,38,0.15); border: 1px solid #dc2626; border-radius: 14px; padding: 10px; margin-bottom: 14px; text-align: center;">
+            <span>🍽️ Comanda para <strong>Mesa #<span id="checkout-mesa-val">--</span></strong> (Servicio en Sala)</span>
           </div>
 
           <div class="form-group">

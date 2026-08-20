@@ -31,21 +31,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// ─── DETECCIÓN DE MESA DESDE LA URL O SELECTOR ──────────────────────────────
+// ─── DETECCIÓN DE MESA DESDE LA URL O MODO CASA ──────────────────────────────
 function initMesaDetection() {
   const urlParams = new URLSearchParams(window.location.search);
   const mesaParam = urlParams.get('mesa');
-  const mesaPickerBar = document.getElementById('mesa-picker-bar');
+  const mesaQrTag = document.getElementById('mesa-qr-tag');
+  const mesaQrNum = document.getElementById('mesa-qr-num');
+  const boxTipoSelector = document.getElementById('box-tipo-selector');
+  const boxMesa = document.getElementById('box-mesa-select');
+  const checkoutMesaVal = document.getElementById('checkout-mesa-val');
 
   if (mesaParam) {
+    // Modo Restaurante (Escaneo de QR en mesa)
     state.mesa = parseInt(mesaParam, 10);
     state.tipoEntrega = 'mesa';
-    if (mesaPickerBar) mesaPickerBar.classList.add('hidden');
+    if (mesaQrTag) mesaQrTag.classList.remove('hidden');
+    if (mesaQrNum) mesaQrNum.textContent = state.mesa;
+    if (boxTipoSelector) boxTipoSelector.classList.add('hidden');
+    if (boxMesa) boxMesa.classList.remove('hidden');
+    if (checkoutMesaVal) checkoutMesaVal.textContent = state.mesa;
     selectTipoBtn('mesa');
   } else {
+    // Modo Casa (App Instalada / Pedido a Domicilio o Llevar)
     state.mesa = null;
     state.tipoEntrega = 'domicilio';
-    if (mesaPickerBar) mesaPickerBar.classList.add('hidden');
+    if (mesaQrTag) mesaQrTag.classList.add('hidden');
+    if (boxTipoSelector) boxTipoSelector.classList.remove('hidden');
+    if (boxMesa) boxMesa.classList.add('hidden');
     selectTipoBtn('domicilio');
   }
 }
@@ -73,30 +85,18 @@ function selectTipoBtn(tipo) {
     }
   });
 
-  const boxMesa = document.getElementById('box-mesa-select');
   const boxDir = document.getElementById('box-direccion');
   const boxTel = document.getElementById('box-telefono');
-  const icon = document.getElementById('order-mode-icon');
-  const text = document.getElementById('order-mode-text');
 
   if (tipo === 'mesa') {
-    if (boxMesa) boxMesa.classList.remove('hidden');
     if (boxDir) boxDir.classList.add('hidden');
     if (boxTel) boxTel.classList.add('hidden');
-    if (icon) icon.textContent = '🍽️';
-    if (text) text.textContent = `Mesa #${state.mesa || 3}`;
   } else if (tipo === 'domicilio') {
-    if (boxMesa) boxMesa.classList.add('hidden');
     if (boxDir) boxDir.classList.remove('hidden');
     if (boxTel) boxTel.classList.remove('hidden');
-    if (icon) icon.textContent = '🛵';
-    if (text) text.textContent = 'A Domicilio';
   } else if (tipo === 'recoger') {
-    if (boxMesa) boxMesa.classList.add('hidden');
     if (boxDir) boxDir.classList.add('hidden');
     if (boxTel) boxTel.classList.remove('hidden');
-    if (icon) icon.textContent = '🥡';
-    if (text) text.textContent = 'Para Llevar';
   }
 }
 
